@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 """
-YOUR HEADER COMMENT HERE
+This program finds the genes in the Salmonella DNA
 
-@author: YOUR NAME HERE
+Author: Peter Seger
 
 """
 
@@ -25,13 +24,20 @@ def get_complement(nucleotide):
 
         nucleotide: a nucleotide (A, C, G, or T) represented as a string
         returns: the complementary nucleotide
-    >>> get_complement('A')
-    'T'
-    >>> get_complement('C')
-    'G'
-    """
-    # TODO: implement this
-    pass
+
+    >>> get_complement('G')
+    'C'
+        """
+    if nucleotide == 'T':
+        return 'A'
+    elif nucleotide == 'A':
+        return 'T'
+    elif nucleotide == 'G':
+        return 'C'
+    elif nucleotide == 'C':
+        return 'G'
+    else:
+        return None
 
 
 def get_reverse_complement(dna):
@@ -45,7 +51,12 @@ def get_reverse_complement(dna):
     >>> get_reverse_complement("CCGCGTTCA")
     'TGAACGCGG'
     """
-    # TODO: implement this
+    new_dna = ""
+    i = len(dna) - 1
+    while i >= 0:
+        new_dna = new_dna + get_complement(dna[i])
+        i = i-1
+    return new_dna
     pass
 
 
@@ -62,8 +73,15 @@ def rest_of_ORF(dna):
     >>> rest_of_ORF("ATGAGATAGG")
     'ATGAGA'
     """
-    # TODO: implement this
-    pass
+    i = 0
+    final_string = ''
+    while i < len(dna):
+        codon = dna[i:i+3]
+        if codon == "TAA" or codon == 'TAG' or codon == 'TGA':
+            return final_string
+        final_string += codon
+        i += 3
+    return final_string
 
 
 def find_all_ORFs_oneframe(dna):
@@ -79,8 +97,17 @@ def find_all_ORFs_oneframe(dna):
     >>> find_all_ORFs_oneframe("ATGCATGAATGTAGATAGATGTGCCC")
     ['ATGCATGAATGTAGA', 'ATGTGCCC']
     """
-    # TODO: implement this
-    pass
+    i = 0
+    res_list = []
+    while i < len(dna):
+        codon = dna[i:i+3]
+        if codon == "ATG":
+            temp = rest_of_ORF(dna[i:])
+            res_list.append(temp)
+            i += len(temp)
+        else:
+            i += 3
+    return res_list
 
 
 def find_all_ORFs(dna):
@@ -96,8 +123,15 @@ def find_all_ORFs(dna):
     >>> find_all_ORFs("ATGCATGAATGTAG")
     ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
     """
-    # TODO: implement this
-    pass
+    res_list = []
+    dna1 = dna
+    dna2 = dna[1:]
+    dna3 = dna[2:]
+    a = find_all_ORFs_oneframe(dna1)
+    b = find_all_ORFs_oneframe(dna2)
+    c = find_all_ORFs_oneframe(dna3)
+    res_list = a + b + c
+    return res_list
 
 
 def find_all_ORFs_both_strands(dna):
@@ -109,8 +143,11 @@ def find_all_ORFs_both_strands(dna):
     >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
     ['ATGCGAATG', 'ATGCTACATTCGCAT']
     """
-    # TODO: implement this
-    pass
+    res_list = []
+    a = find_all_ORFs(dna)
+    b = find_all_ORFs(get_reverse_complement(dna))
+    res_list = a + b
+    return res_list
 
 
 def longest_ORF(dna):
@@ -161,6 +198,8 @@ def gene_finder(dna):
     # TODO: implement this
     pass
 
+
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+    doctest.run_docstring_examples(find_all_ORFs_both_strands, globals(),
+                                   verbose=True)
